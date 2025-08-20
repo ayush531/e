@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LendFast | My Applications</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { poppins: ['Poppins','sans-serif'] },
+          colors: { primary: '#22c55e' }
+        }
+      }
+    }
+  </script>
+  <style> body{ font-family:'Poppins',sans-serif; } </style>
+</head>
+<body class="bg-gray-950 text-white">
+  <!-- Navbar -->
+  <header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="text-2xl md:text-3xl font-bold text-primary">LendFast</div>
+      <nav class="hidden md:flex space-x-6 font-medium text-lg">
+        <a href="index.html" class="hover:text-primary">Home</a>
+        <a href="products.html" class="hover:text-primary">Loan Products</a>
+        <a href="cart.html" class="hover:text-primary">My Applications</a>
+        <a href="Login.html" class="hover:text-primary">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Applications List -->
+  <main class="max-w-6xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-bold mb-8 text-center md:text-left">Selected Loans</h1>
+
+    <div id="appList" class="space-y-6"></div>
+
+    <div id="actions" class="mt-10 bg-gray-900 p-6 rounded-xl text-center md:text-right hidden">
+      <p class="text-sm text-gray-300 mb-4">You can proceed to fill the application & eKYC.</p>
+      <a href="payment.html" class="bg-primary text-black font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition">Proceed to Apply</a>
+    </div>
+  </main>
+
+  <script>
+    const appList = document.getElementById('appList');
+    const actions = document.getElementById('actions');
+
+    function render() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      appList.innerHTML = '';
+      if (cart.length === 0) {
+        appList.innerHTML = '<p class="text-center text-gray-400">No loans selected yet. Go to Products to start an application.</p>';
+        actions.classList.add('hidden');
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-gray-900 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between';
+        div.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <img src="${item.image}" class="w-20 h-20 object-cover rounded-lg" />
+            <div>
+              <h2 class="text-lg font-semibold">${item.name}</h2>
+              <p class="text-gray-400 text-sm">Rate: ${item.rate}% • Tenure: ${item.tenure} • Amount: ${item.amount}</p>
+              <p class="text-gray-500 text-xs">Processing: ${item.processing}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4 mt-4 md:mt-0">
+            <button class="remove text-red-400 hover:text-red-600" data-index="${index}">Remove</button>
+          </div>
+        `;
+        appList.appendChild(div);
+      });
+
+      actions.classList.remove('hidden');
+      addHandlers();
+    }
+
+    function addHandlers() {
+      document.querySelectorAll('.remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const i = +e.target.dataset.index;
+          let cart = JSON.parse(localStorage.getItem('cart')) || [];
+          cart.splice(i,1);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          render();
+        });
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Products | LendFast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { poppins: ['Poppins','sans-serif'] },
+          colors: { primary: '#22c55e' }
+        }
+      }
+    }
+  </script>
+  <style> body { font-family: 'Poppins', sans-serif; } </style>
+</head>
+<body class="bg-gray-950 text-white">
+  <!-- Navbar -->
+  <header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="text-2xl font-bold text-primary">LendFast</div>
+      <nav class="hidden md:flex space-x-6 font-medium text-lg">
+        <a href="index.html" class="hover:text-primary">Home</a>
+        <a href="products.html" class="hover:text-primary">Loan Products</a>
+        <a href="cart.html" class="hover:text-primary">My Applications</a>
+        <a href="Login.html" class="hover:text-primary">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Products -->
+  <main class="max-w-6xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-bold mb-8 text-center">Choose a Loan</h1>
+    <div id="products" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></div>
+  </main>
+
+  <script>
+    // Loan products
+    const products = [
+      {
+        id: 1,
+        name: 'Personal Loan',
+        rate: 12.5,
+        tenure: '12–60 months',
+        amount: '₹50k–₹20L',
+        image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1200&auto=format&fit=crop',
+        processing: 'Up to 2% + GST'
+      },
+      {
+        id: 2,
+        name: 'Home Loan',
+        rate: 8.75,
+        tenure: '5–30 years',
+        amount: '₹10L–₹5Cr',
+        image: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c52f?q=80&w=1200&auto=format&fit=crop',
+        processing: 'Up to 0.5% + GST'
+      },
+      {
+        id: 3,
+        name: 'Business Loan',
+        rate: 13.9,
+        tenure: '12–60 months',
+        amount: '₹2L–₹1Cr',
+        image: 'https://images.unsplash.com/photo-1554774853-b415df9eeb92?q=80&w=1200&auto=format&fit=crop',
+        processing: 'Up to 2.5% + GST'
+      },
+      {
+        id: 4,
+        name: 'Education Loan',
+        rate: 10.5,
+        tenure: '3–15 years',
+        amount: '₹1L–₹50L',
+        image: 'https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?q=80&w=1200&auto=format&fit=crop',
+        processing: 'Up to 1% + GST'
+      }
+    ];
+
+    const productContainer = document.getElementById('products');
+    products.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'bg-gray-900 rounded-2xl p-4 shadow-md flex flex-col';
+      card.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" class="w-full h-44 object-cover rounded-xl mb-4">
+        <h3 class="text-xl font-semibold mb-1">${p.name}</h3>
+        <ul class="text-gray-300 text-sm space-y-1 mb-3">
+          <li><span class="text-gray-400">Rate (APR):</span> ${p.rate}%</li>
+          <li><span class="text-gray-400">Tenure:</span> ${p.tenure}</li>
+          <li><span class="text-gray-400">Amount:</span> ${p.amount}</li>
+          <li><span class="text-gray-400">Processing:</span> ${p.processing}</li>
+        </ul>
+        <div class="mt-auto flex gap-3">
+          <button onclick="addToCart(${p.id})" class="bg-primary text-black px-4 py-2 rounded-lg font-semibold hover:opacity-90">Apply</button>
+          <button onclick="estimateEmi(${p.id})" class="border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary/10">EMI</button>
+        </div>
+      `;
+      productContainer.appendChild(card);
+    });
+
+    // Persist selected loan(s) in localStorage.cart similar to old site
+    function addToCart(id) {
+      const selected = products.find(x => x.id === id);
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (!cart.find(i => i.id === id)) {
+        cart.push({ id: selected.id, name: selected.name, price: 0,
+                    rate: selected.rate, tenure: selected.tenure, amount: selected.amount, processing: selected.processing,
+                    image: selected.image, qty: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`${selected.name} added to My Applications.`);
+      location.href = 'cart.html';
+    }
+
+    function estimateEmi(id) {
+      const p = products.find(x => x.id === id);
+      const principal = 500000; // demo principal for quick estimate
+      const r = p.rate / 12 / 100;
+      const n = 36;
+      const emi = Math.round(principal * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1));
+      alert(`${p.name} • Example EMI\nAmount: ₹${principal}\nTenure: 36 months\nRate: ${p.rate}%\nEstimated EMI: ₹${emi}`);
+    }
+  </script>
+</body>
+</html>

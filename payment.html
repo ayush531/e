@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Application & eKYC | LendFast</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { poppins: ['Poppins','sans-serif'] },
+          colors: { primary: '#22c55e' }
+        }
+      }
+    }
+  </script>
+  <style> body{ font-family:'Poppins',sans-serif; } </style>
+</head>
+<body class="bg-gray-950 text-white">
+
+  <!-- Navbar -->
+  <header class="bg-black/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="text-2xl font-bold text-primary">LendFast</div>
+      <nav class="hidden md:flex space-x-6 font-medium text-lg">
+        <a href="index.html" class="hover:text-primary">Home</a>
+        <a href="products.html" class="hover:text-primary">Loan Products</a>
+        <a href="cart.html" class="hover:text-primary">My Applications</a>
+        <a href="Login.html" class="hover:text-primary">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Application Section -->
+  <main class="max-w-5xl mx-auto px-6 py-16">
+    <h1 class="text-3xl font-bold mb-10 text-center">Loan Application & eKYC</h1>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Form -->
+      <form id="appForm" class="space-y-4 bg-gray-900 p-6 rounded-xl">
+        <h2 class="text-xl font-semibold mb-2">Applicant Details</h2>
+
+        <label class="block">
+          <span class="text-sm">Full Name</span>
+          <input id="fullName" type="text" placeholder="Your Name" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+        </label>
+
+        <label class="block">
+          <span class="text-sm">Email</span>
+          <input id="email" type="email" placeholder="you@example.com" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+        </label>
+
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm">Mobile</span>
+            <input id="mobile" type="tel" placeholder="10-digit mobile" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+          <label class="block">
+            <span class="text-sm">DOB</span>
+            <input id="dob" type="date" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm">PAN</span>
+            <input id="pan" type="text" placeholder="ABCDE1234F" class="w-full mt-1 p-3 uppercase rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+          <label class="block">
+            <span class="text-sm">Aadhaar (last 4)</span>
+            <input id="aadhaar" type="text" placeholder="1234" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+        </div>
+
+        <label class="block">
+          <span class="text-sm">Employment</span>
+          <select id="employment" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">Select</option>
+            <option>Salaried</option>
+            <option>Self-Employed</option>
+            <option>Student</option>
+          </select>
+        </label>
+
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm">Monthly Income (₹)</span>
+            <input id="income" type="number" placeholder="e.g., 40000" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+          <label class="block">
+            <span class="text-sm">City</span>
+            <input id="city" type="text" placeholder="Your city" class="w-full mt-1 p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+          </label>
+        </div>
+
+        <button id="submitBtn" type="submit" class="w-full bg-primary text-black font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition">Submit Application</button>
+
+        <p id="formMsg" class="text-sm text-gray-300"></p>
+      </form>
+
+      <!-- Summary -->
+      <div class="bg-gray-900 p-6 rounded-xl">
+        <h2 class="text-xl font-semibold mb-4">Selected Loans</h2>
+        <ul id="summaryList" class="text-gray-300 mb-6 space-y-2"></ul>
+        <hr class="border-gray-700 mb-4" />
+        <p class="text-sm text-gray-400">By submitting, you agree to our T&Cs, eKYC, and credit checks.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const summaryList = document.getElementById('summaryList');
+    const form = document.getElementById('appForm');
+    const msg = document.getElementById('formMsg');
+
+    function renderSummary() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      summaryList.innerHTML = '';
+      if (cart.length === 0) {
+        summaryList.innerHTML = '<li>No loans selected.</li>';
+        return;
+      }
+      cart.forEach(i => {
+        const li = document.createElement('li');
+        li.textContent = `${i.name} — Rate ${i.rate}% | Tenure ${i.tenure} | Amount ${i.amount}`;
+        summaryList.appendChild(li);
+      });
+    }
+
+    function validate() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const mobile = document.getElementById('mobile').value.trim();
+      const pan = document.getElementById('pan').value.trim().toUpperCase();
+      const aadhaar = document.getElementById('aadhaar').value.trim();
+      const employment = document.getElementById('employment').value;
+      const income = +document.getElementById('income').value;
+      const city = document.getElementById('city').value.trim();
+
+      // Basic validations
+      const panOk = /^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan);
+      const mobileOk = /^[6-9][0-9]{9}$/.test(mobile);
+      const aadhaarOk = /^[0-9]{4}$/.test(aadhaar);
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!fullName || !emailOk || !mobileOk || !panOk || !aadhaarOk || !employment || !income || !city) {
+        msg.textContent = 'Please fill all fields correctly (PAN format ABCDE1234F, Aadhaar last 4, valid mobile).';
+        return false;
+      }
+      msg.textContent = '';
+      return true;
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      setTimeout(() => {
+        localStorage.removeItem('cart');
+        window.location.href = 'thankyou.html';
+      }, 1500);
+    });
+
+    renderSummary();
+  </script>
+</body>
+</html>
